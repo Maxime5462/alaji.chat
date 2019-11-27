@@ -28,8 +28,11 @@ const messages =[]
 
 io.on('connection', function(socket) {
 
-    const pseudo = escapeHtml(socket.handshake.query.pseudo).substr(0,50)
+    const pseudo = escapeHtml(socket.handshake.query.pseudo).substr(0, 30)
     const avatar = escapeHtml(socket.handshake.query.avatar)
+
+    socket.handshake.query.pseudo = pseudo
+    socket.handshake.query.avatar = avatar
 
     console.log(`${pseudo} s'est connecté !`)
     sendClients();
