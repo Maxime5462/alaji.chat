@@ -16,8 +16,8 @@ function sendClients () {
     for(const index in connected){
         const client = connected[index]
         clients.push({
-            avatar: client.handshake.query.avatar,
-            pseudo: client.handshake.query.pseudo,
+            avatar: escapeHtml(client.handshake.query.avatar),
+            pseudo: escapeHtml(client.handshake.query.pseudo),
         })
     }
 
