@@ -8,11 +8,36 @@ function getHtml (data) {
 }
 
 function addMessage (data) {
-    document.getElementById('messages').append(getHtml(data))
+    const date = new Date(data.date)
+    const value = `
+    <div class="message">
+    <div class="avatar">
+    <img src="${data.avatar}" width="40px">
+    </div>
+    <div class="content">
+    <div class="pseudo">${data.pseudo}</div>
+    <div class="date">
+    ${date.toLocaleDateString()};
+    à
+    ${date.toLocaleTimeString()};
+    </div>
+    ${data.message}
+    </div>
+    </div>`
+    document.getElementById('messages').append(getHtml(value))
 }
 
 function addUser (data) {
-    document.getElementById('users').append(getHtml(data))
+    const value=`
+    <div class="client">
+    <div class="avatar">
+    <img src="${data.avatar}" width="40px">
+    </div>
+
+    <div class="pseudo">${data.pseudo}</div>
+    </div>
+    `
+    document.getElementById('users').append(getHtml(value))
 }
 
 const urlParams = new URLSearchParams(window.location.search)
@@ -25,33 +50,38 @@ const socket = io({
         avatar: avatar
     }
 })
+
+socket.on('clients',function(data){
+    document.getElementById('users').innerHTML=''
+    data.forEach(function(client){
+        addUser(client)
+    })
+})
+socket.on('messages',function(data){
+    data.forEach(function(message){
+        addMessage(message)
+    })
+})
+
+
 socket.on('message',function(value){
-    addMessage(`
-        <div class="message">
-        <div class="avatar">
-        <img src="${value.avatar}" width="40px">
-        </div>
-        <div class="content">
-        <div class="pseudo">${value.pseudo}</div>
-        ${value.message}
-        </div>
-        </div>`)
+    addMessage(value)
 
 
-    })
+})
 
 
 
-    document.querySelector('[data-avatar]').setAttribute('src', avatar)
-    document.querySelector('[data-pseudo]').textContent = pseudo
+document.querySelector('[data-avatar]').setAttribute('src', avatar)
+document.querySelector('[data-pseudo]').textContent = pseudo
 
-    document.getElementById('send').addEventListener('submit', function (e) {
-        e.preventDefault()
-        const value = this.querySelector('input').value
-        if (value) {
-            // Send message
-            socket.emit("message",value)
-            console.log(value)
-            this.querySelector('input').value = null
-        }
-    })
+document.getElementById('send').addEventListener('submit', function (e) {
+    e.preventDefault()
+    const value = this.querySelector('input').value
+    if (value) {
+        // Send message
+        socket.emit("message",value)
+        console.log(value)
+        this.querySelector('input').value = null
+    }
+})
